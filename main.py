@@ -5,6 +5,7 @@ from world import World
 from turret import Turret
 from button import Button
 import constants as c
+# from load import *
 
 credits_timer = 10 * c.FPS
 
@@ -13,6 +14,7 @@ pg.init()
 
 #create clock
 clock = pg.time.Clock()
+
 
 
 ###########################################
@@ -52,8 +54,8 @@ while running:
 ###########################################
 
 #create game window
-screen = pg.display.set_mode((c.SCREEN_WIDTH + c.SIDE_PANEL, c.SCREEN_HEIGHT))
-pg.display.set_caption("Tower Defence")
+screen = pg.display.set_mode((c.SCREEN_WIDTH + c.SIDE_PANEL, c.SCREEN_HEIGHT ))
+pg.display.set_caption("Slay Eater")
 
 #game variables
 game_over = False
@@ -62,6 +64,9 @@ level_started = False
 last_enemy_spawn = pg.time.get_ticks()
 placing_turrets = False
 selected_turret = None
+
+
+##################################################################################################################
 
 #load images
 #map
@@ -104,6 +109,9 @@ with open('levels/level.tmj') as file:
 text_font = pg.font.SysFont("Consolas", 24, bold = True)
 large_font = pg.font.SysFont("Consolas", 36)
 
+##################################################################################################################
+
+
 #function for outputting text onto the screen
 def draw_text(text, font, text_col, x, y):
   img = font.render(text, True, text_col)
@@ -125,9 +133,9 @@ def display_credits(screen):
     screen.fill(WHITE)
     credits_text = [
         "Crédits:",
-        "Développé par [Votre Nom]",
+        "Développé par Slay Eater",
         "Musique par [Nom de l'Artiste]",
-        "Graphismes par [Nom de l'Artiste]",
+        "Graphismes par prsque [Nom de l'Artiste]",
         "Merci d'avoir joué!",
     ]
     y_offset = 200
@@ -144,7 +152,7 @@ def create_turret(mouse_pos):
   #calculate the sequential number of the tile
   mouse_tile_num = (mouse_tile_y * c.COLS) + mouse_tile_x
   #check if that tile is grass
-  if world.tile_map[mouse_tile_num] == 7:
+  if world.tile_map[mouse_tile_num] == 265:
     #check that there isn't already a turret there
     space_is_free = True
     for turret in turret_group:
@@ -184,7 +192,7 @@ upgrade_button = Button(c.SCREEN_WIDTH + 5, 180, upgrade_turret_image, True)
 begin_button = Button(c.SCREEN_WIDTH + 60, 300, begin_image, True)
 restart_button = Button(310, 300, restart_image, True)
 fast_forward_button = Button(c.SCREEN_WIDTH + 50, 300, fast_forward_image, False)
-import pygame as pg
+
 
 
 #game loop
@@ -260,8 +268,8 @@ while run:
     #draw buttons
     #button for placing turrets
     #for the "turret button" show cost of turret and draw the button
-    draw_text(str(c.BUY_COST), text_font, "grey100", c.SCREEN_WIDTH + 215, 135)
-    screen.blit(coin_image, (c.SCREEN_WIDTH + 260, 130))
+    draw_text(str(c.BUY_COST), text_font, "grey100", c.SCREEN_HEIGHT + 215, 135)
+    screen.blit(coin_image, (c.SCREEN_HEIGHT + 260, 150))
     if turret_button.draw(screen):
       placing_turrets = True
     #if placing turrets then show the cancel button as well
@@ -310,6 +318,7 @@ while run:
       #empty groups
       enemy_group.empty()
       turret_group.empty()
+
 
   #event handler
   for event in pg.event.get():

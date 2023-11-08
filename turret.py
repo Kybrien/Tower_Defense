@@ -5,47 +5,52 @@ from turret_data import TURRET_DATA
 
 class Turret(pg.sprite.Sprite):
   def __init__(self, sprite_sheets, tile_x, tile_y, shot_fx):
+  # Appelle le constructeur de la classe parent (Sprite)
     pg.sprite.Sprite.__init__(self)
+    
+    # Initialise les propriétés de la tourelle telles que le niveau d'amélioration, la portée, le temps de recharge, etc.
     self.upgrade_level = 1
     self.range = TURRET_DATA[self.upgrade_level - 1].get("range")
     self.cooldown = TURRET_DATA[self.upgrade_level - 1].get("cooldown")
-    self.last_shot = pg.time.get_ticks()
-    self.selected = False
-    self.target = None
+    self.last_shot = pg.time.get_ticks()  # Stocke le moment où la tourelle a tiré pour la dernière fois
+    self.selected = False  # Indique si la tourelle est sélectionnée par le joueur
+    self.target = None  # Cible actuelle de la tourelle
 
-    #position variables
+    # Calcul de la position de la tourelle en fonction de la tuile sur laquelle elle est placée
     self.tile_x = tile_x
     self.tile_y = tile_y
-    #calculate center coordinates
-    self.x = (self.tile_x + 0.5) * c.TILE_SIZE
+    #Recupere le Center
+    self.x = (self.tile_x + 0.5) * c.TILE_SIZE 
     self.y = (self.tile_y + 0.5) * c.TILE_SIZE
-    #shot sound effect
+
+    # Effet sonore du tir
     self.shot_fx = shot_fx
 
-    #animation variables
+    # Variables d'animation
     self.sprite_sheets = sprite_sheets
     self.animation_list = self.load_images(self.sprite_sheets[self.upgrade_level - 1])
     self.frame_index = 0
     self.update_time = pg.time.get_ticks()
 
-    #update image
-    self.angle = 90
+    # Mise à jour de l'image
+    self.angle = 90  # Angle initial de la tourelle
     self.original_image = self.animation_list[self.frame_index]
-    self.image = pg.transform.rotate(self.original_image, self.angle)
-    self.rect = self.image.get_rect()
-    self.rect.center = (self.x, self.y)
+    self.image = pg.transform.rotate(self.original_image, self.angle)  # Applique la rotation à l'image
+    self.rect = self.image.get_rect()  # Obtient le rectangle de collision de l'image
+    self.rect.center = (self.x, self.y)  # Centre le rectangle sur la position x, y
 
-    #create transparent circle showing range
+
+    # Création d'un cercle transparent indiquant la portée
     self.range_image = pg.Surface((self.range * 2, self.range * 2))
     self.range_image.fill((0, 0, 0))
     self.range_image.set_colorkey((0, 0, 0))
-    pg.draw.circle(self.range_image, "grey100", (self.range, self.range), self.range)
+    pg.draw.circle(self.range_image, "grey100", (self.range, self.range), self.range)  # Dessine le cercle de portée
     self.range_image.set_alpha(100)
     self.range_rect = self.range_image.get_rect()
     self.range_rect.center = self.rect.center
 
+  # Extrait les images du Sprite
   def load_images(self, sprite_sheet):
-    #extract images from spritesheet
     size = sprite_sheet.get_height()
     animation_list = []
     for x in range(c.ANIMATION_STEPS):
@@ -54,7 +59,7 @@ class Turret(pg.sprite.Sprite):
     return animation_list
 
   def update(self, enemy_group, world):
-    #if target picked, play firing animation
+    # Lorsqu'un ennemi est prit pour cible
     if self.target:
       self.play_animation()
     else:
