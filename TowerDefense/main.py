@@ -6,11 +6,50 @@ from turret import Turret
 from button import Button
 import constants as c
 
+credits_timer = 10 * c.FPS
+
 #initialise pygame
 pg.init()
 
 #create clock
 clock = pg.time.Clock()
+
+
+###########################################
+####              MENU                 ####
+###########################################
+
+
+# Define the window size
+screen = pg.display.set_mode((c.SCREEN_WIDTH, c.SCREEN_HEIGHT))
+pg.display.set_caption("Menu d'Accueil")
+
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+font = pg.font.Font(None, 36)
+
+#Menu loop
+running = True
+while running:
+    #Event Gestion
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
+            running = False
+        if event.type == pg.KEYDOWN:
+            if event.key == pg.K_RETURN:
+                #If Enter Pressed, quit the loop
+                running = False
+    
+    #Show Menu text
+    screen.fill(WHITE)
+    text = font.render("Appuyez sur Entrée pour commencer", True, BLACK)
+    text_rect = text.get_rect(center=(c.SCREEN_WIDTH //2 , c.SCREEN_HEIGHT//2 ))
+    screen.blit(text, text_rect)
+
+    #Update the display
+    pg.display.flip()
+    
+###########################################
 
 #create game window
 screen = pg.display.set_mode((c.SCREEN_WIDTH + c.SIDE_PANEL, c.SCREEN_HEIGHT))
@@ -81,7 +120,23 @@ def display_data():
   draw_text(str(world.health), text_font, "grey100", c.SCREEN_WIDTH + 50, 40)
   screen.blit(coin_image, (c.SCREEN_WIDTH + 10, 65))
   draw_text(str(world.money), text_font, "grey100", c.SCREEN_WIDTH + 50, 70)
-  
+
+def display_credits(screen):
+    screen.fill(WHITE)
+    credits_text = [
+        "Crédits:",
+        "Développé par [Votre Nom]",
+        "Musique par [Nom de l'Artiste]",
+        "Graphismes par [Nom de l'Artiste]",
+        "Merci d'avoir joué!",
+    ]
+    y_offset = 200
+    for line in credits_text:
+        text = font.render(line, True, BLACK)
+        text_rect = text.get_rect(center=(c.SCREEN_WIDTH // 2, y_offset))
+        screen.blit(text, text_rect)
+        y_offset += 40
+    pg.display.flip()  
 
 def create_turret(mouse_pos):
   mouse_tile_x = mouse_pos[0] // c.TILE_SIZE
@@ -129,6 +184,8 @@ upgrade_button = Button(c.SCREEN_WIDTH + 5, 180, upgrade_turret_image, True)
 begin_button = Button(c.SCREEN_WIDTH + 60, 300, begin_image, True)
 restart_button = Button(310, 300, restart_image, True)
 fast_forward_button = Button(c.SCREEN_WIDTH + 50, 300, fast_forward_image, False)
+import pygame as pg
+
 
 #game loop
 run = True
@@ -233,8 +290,14 @@ while run:
     if game_outcome == -1:
       draw_text("GAME OVER", large_font, "grey0", 310, 230)
     elif game_outcome == 1:
-      draw_text("YOU WIN!", large_font, "grey0", 315, 230)
-    #restart level
+        screen.fill(WHITE)
+        draw_text("YOU WIN!", large_font, BLACK, c.SCREEN_WIDTH // 2, c.SCREEN_HEIGHT // 2)
+        pg.display.flip()
+        credits_timer -= 1
+        if credits_timer <= 0:
+          display_credits(screen)
+
+
     if restart_button.draw(screen):
       game_over = False
       level_started = False
