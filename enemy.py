@@ -17,10 +17,13 @@ class Enemy(pg.sprite.Sprite):
     self.image = pg.transform.rotate(self.original_image, self.angle)
     self.rect = self.image.get_rect()
     self.rect.center = self.pos
+    self.animation_frames = self.load_animation_frames(images.get(enemy_type))
+    self.current_frame = 0
 
   def update(self, world):
     self.move(world)
     self.rotate()
+    self.update_animation()
     self.check_alive(world)
 
   def move(self, world):
@@ -59,3 +62,21 @@ class Enemy(pg.sprite.Sprite):
       world.killed_enemies += 1
       world.money += c.KILL_REWARD
       self.kill()
+      
+  def load_animation_frames(self, sprite_sheet):
+      frames = []
+      for i in range(0, sprite_sheet.get_width(), 32):
+          frame = sprite_sheet.subsurface((i, 0, 32, 32))
+          frames.append(frame)
+      return frames
+    
+  def update_animation(self):
+      # Mettez à jour la frame actuelle de l'animation (par exemple, toutes les 5 frames)
+      self.current_frame = (self.current_frame + 1) % (len(self.animation_frames) * 12)
+      #Prenez en compte le ralentissement de l'animation en sautant des frames
+      actual_frame = self.current_frame // 12
+      # Mettez à jour l'image actuelle
+      self.original_image = self.animation_frames[actual_frame]
+      self.image = pg.transform.rotate(self.original_image, self.angle)
+      self.rect = self.image.get_rect()
+      self.rect.center = self.pos
