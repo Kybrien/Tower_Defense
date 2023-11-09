@@ -4,12 +4,12 @@ from enemy import Enemy
 from world import World
 from turret import Turret
 from button import Button
+import menu
 import constants as c
-from menu import Menu
-from load import Load
+# from load import *
 
-
-credits_timer = 10 * c.FPS
+WHITE = pg.Color(255, 255, 255)
+BLACK = pg.Color(0, 0, 0)
 
 #initialise pygame
 pg.init()
@@ -17,40 +17,18 @@ pg.init()
 #create clock
 clock = pg.time.Clock()
 
- 
-
-###########################################
-####              MENU                 ####
-###########################################
 
 
- # Define the window size
-screen = pg.display.set_mode((c.SCREEN_WIDTH, c.SCREEN_HEIGHT))
-pg.display.set_caption("Menu d'Accueil")
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-font = pg.font.Font(None, 36)
- #Menu loop
-running = True
-while running:
-     #Event Gestion
-     for event in pg.event.get():
-         if event.type == pg.QUIT:
-             running = False
-         if event.type == pg.KEYDOWN:
-             if event.key == pg.K_RETURN:
-                 #If Enter Pressed, quit the loop
-                 running = False
+##########################
+####      MENU                 
+##########################
+
+
+menu.run_menu()
     
-     #Show Menu text
-     screen.fill(WHITE)
-     text = font.render("Appuyez sur Entrée pour commencer", True, BLACK)
-     text_rect = text.get_rect(center=(c.SCREEN_WIDTH //2 , c.SCREEN_HEIGHT//2 ))
-     screen.blit(text, text_rect)
-     #Update the display
-     pg.display.flip()
-    
-###########################################
+########################
+
+
 
 #create game window
 screen = pg.display.set_mode((c.SCREEN_WIDTH + c.SIDE_PANEL, c.SCREEN_HEIGHT ))
@@ -58,7 +36,7 @@ pg.display.set_caption("Slay Eater")
 
 #game variables
 game_over = False
-game_outcome = 0# -1 is loss & 1 is win
+game_outcome = 0 # -1 is loss & 1 is win
 level_started = False
 last_enemy_spawn = pg.time.get_ticks()
 placing_turrets = False
@@ -128,22 +106,6 @@ def display_data():
   screen.blit(coin_image, (c.SCREEN_WIDTH + 10, 65))
   draw_text(str(world.money), text_font, "grey100", c.SCREEN_WIDTH + 50, 70)
 
-def display_credits(screen):
-    screen.fill(WHITE)
-    credits_text = [
-        "Crédits:",
-        "Développé par Slay Eater",
-        "Musique par [Nom de l'Artiste]",
-        "Graphismes par prsque [Nom de l'Artiste]",
-        "Merci d'avoir joué!",
-    ]
-    y_offset = 200
-    for line in credits_text:
-        text = font.render(line, True, BLACK)
-        text_rect = text.get_rect(center=(c.SCREEN_WIDTH // 2, y_offset))
-        screen.blit(text, text_rect)
-        y_offset += 40
-    pg.display.flip()  
 
 def create_turret(mouse_pos):
   mouse_tile_x = mouse_pos[0] // c.TILE_SIZE
@@ -199,7 +161,7 @@ run = True
 while run:
 
   clock.tick(c.FPS)
-  dt = clock.get_time() / 1000.0  # Convertir le temps en secondes
+
   #########################
   # UPDATING SECTION
   #########################
@@ -215,7 +177,7 @@ while run:
       game_outcome = 1 #win
 
     #update groups
-    enemy_group.update(world,dt)
+    enemy_group.update(world)
     turret_group.update(enemy_group, world)
 
     #highlight selected turret
@@ -300,10 +262,6 @@ while run:
         screen.fill(WHITE)
         draw_text("YOU WIN!", large_font, BLACK, c.SCREEN_WIDTH // 2, c.SCREEN_HEIGHT // 2)
         pg.display.flip()
-        credits_timer -= 1
-        if credits_timer <= 0:
-          display_credits(screen)
-
 
     if restart_button.draw(screen):
       game_over = False
