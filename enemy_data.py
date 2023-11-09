@@ -127,5 +127,5 @@ ENEMY_DATA = {
 
 ENEMY_DATA["boss"] = {
     "health": 100,  
-    "speed": 5,
+    "speed": 3,
 }

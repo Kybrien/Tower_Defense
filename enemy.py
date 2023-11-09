@@ -6,30 +6,27 @@ from enemy_data import ENEMY_DATA
 
 class Enemy(pg.sprite.Sprite):
   def __init__(self, enemy_type, waypoints, images):
-        pg.sprite.Sprite.__init__(self)
-        self.waypoints = waypoints
-        self.pos = Vector2(self.waypoints[0])
-        self.target_waypoint = 1
-        self.health = ENEMY_DATA.get(enemy_type)["health"]
-        self.speed = ENEMY_DATA.get(enemy_type)["speed"]
-        self.angle = 0
-        self.images = images[enemy_type]
-        self.image_index = 0  # Index de l'image actuelle de l'animation.
-        self.image = self.images[self.image_index]
-        self.rect = self.image.get_rect()
-        self.rect.center = self.pos
-        self.animation_speed = 0.2  # Vitesse de l'animation de marche.
-        self.time_elapsed = 0
+    pg.sprite.Sprite.__init__(self)
+    self.waypoints = waypoints
+    self.pos = Vector2(self.waypoints[0])
+    self.target_waypoint = 1
+    self.health = ENEMY_DATA.get(enemy_type)["health"]
+    self.speed = ENEMY_DATA.get(enemy_type)["speed"]
+    self.angle = 0
+    self.original_image = images.get(enemy_type)
+    self.image = pg.transform.rotate(self.original_image, self.angle)
+    self.rect = self.image.get_rect()
+    self.rect.center = self.pos
+    self.animation_frames = self.load_animation_frames(images.get(enemy_type))
+    self.current_frame = 0
 
+  def update(self, world):
+    self.move(world)
+    self.rotate()
+    self.update_animation()
+    self.check_alive(world)
 
-
-  def update(self, world,dt):
-      self.move(world)
-      self.rotate()
-      self.check_alive(world)
-      self.update_animation(dt)
-
-  def move(self, world,):
+  def move(self, world):
     #define a target waypoint
     if self.target_waypoint < len(self.waypoints):
       self.target = Vector2(self.waypoints[self.target_waypoint])
@@ -65,12 +62,21 @@ class Enemy(pg.sprite.Sprite):
       world.killed_enemies += 1
       world.money += c.KILL_REWARD
       self.kill()
-
-def update_animation(self, dt):
-        # Mettez à jour l'image de l'animation de marche en fonction du temps écoulé.
-        self.time_elapsed += dt
-        if self.time_elapsed >= self.animation_speed:
-            self.image_index = (self.image_index + 1) % len(self.images)
-            self.image = self.images[self.image_index]
-            self.time_elapsed = 0
-
+      
+  def load_animation_frames(self, sprite_sheet):
+      frames = []
+      for i in range(0, sprite_sheet.get_width(), 32):
+          frame = sprite_sheet.subsurface((i, 0, 32, 32))
+          frames.append(frame)
+      return frames
+    
+  def update_animation(self):
+      # Mettez à jour la frame actuelle de l'animation (par exemple, toutes les 5 frames)
+      self.current_frame = (self.current_frame + 1) % (len(self.animation_frames) * 12)
+      #Prenez en compte le ralentissement de l'animation en sautant des frames
+      actual_frame = self.current_frame // 12
+      # Mettez à jour l'image actuelle
+      self.original_image = self.animation_frames[actual_frame]
+      self.image = pg.transform.rotate(self.original_image, self.angle)
+      self.rect = self.image.get_rect()
+      self.rect.center = self.pos

@@ -1,44 +1,89 @@
 import pygame as pg
-from constants import SCREEN_WIDTH,SIDE_PANEL
+import constants as c
 
-class Menu:
-    def __init__(self, screen_width, side_panel):
-        # Initialize pygame
-        pg.init()
+pg.init()
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+font = pg.font.Font(None, 36)
 
-        # Define the window size
-        self.screen = pg.display.set_mode((screen_width + side_panel, screen_width))
-        pg.display.set_caption("Slay Eater")
+def run_menu():
 
-        self.WHITE = (255, 255, 255)
-        self.BLACK = (0, 0, 0)
-        self.font = pg.font.Font(None, 36)
-        self.running = True
+    # Définir la taille de la fenêtre
+    screen = pg.display.set_mode((c.SCREEN_WIDTH, c.SCREEN_HEIGHT))
+    pg.display.set_caption("Menu d'Accueil")
 
-    def run(self):
-        while self.running:
-            self.handle_events()
-            self.update()
-            self.draw()
+    # Bouton "Commencer"
+    start_button = pg.Rect(c.SCREEN_WIDTH // 2 - 100, c.SCREEN_HEIGHT // 2 - 50, 200, 50)
+    start_text = font.render("Commencer", True, BLACK)
+    start_text_rect = start_text.get_rect(center=start_button.center)
 
-    def handle_events(self):
+    # Bouton "Paramètres"
+    settings_button = pg.Rect(c.SCREEN_WIDTH // 2 - 100, c.SCREEN_HEIGHT // 2 + 20, 200, 50)
+    settings_text = font.render("Paramètres", True, BLACK)
+    settings_text_rect = settings_text.get_rect(center=settings_button.center)
+
+    # Bouton "Quitter"
+    quit_button = pg.Rect(c.SCREEN_WIDTH // 2 - 100, c.SCREEN_HEIGHT // 2 + 90, 200, 50)
+    quit_text = font.render("Quitter", True, BLACK)
+    quit_text_rect = quit_text.get_rect(center=quit_button.center)
+
+    # Bouton "Credits"
+    credit_button = pg.Rect(c.SCREEN_WIDTH // 2 - 100, c.SCREEN_HEIGHT // 2 + 250, 200, 50)
+    credit_text = font.render("Crédits", True, BLACK)
+    credit_text_rect = credit_text.get_rect(center=credit_button.center)
+
+    in_settings_menu = False  # Indique si l'utilisateur est dans le menu des paramètres
+
+    # Menu loop
+    running = True
+    while running:
+        # Gestion des événements
         for event in pg.event.get():
             if event.type == pg.QUIT:
-                self.running = False
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_RETURN:
-                    self.running = False
+                pg.quit()
+            if in_settings_menu:
+                if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+                    mouse_pos = pg.mouse.get_pos()
+                    if back_button.collidepoint(mouse_pos):
+                        in_settings_menu = False  # Quittez le menu des paramètres et revenez au menu principal
+            if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+                mouse_pos = pg.mouse.get_pos()
+                if start_button.collidepoint(mouse_pos):
+                    print("Début du jeu!")
+                    running = False  # Quittez le menu et commencez le jeu
+                elif settings_button.collidepoint(mouse_pos):
+                    in_settings_menu = True  # Accédez au menu des paramètres
+                elif quit_button.collidepoint(mouse_pos):
+                    pg.quit()
+                elif credit_button.collidepoint(mouse_pos): #Accédez au crédits
+                    pg.quit()
+                    #Inserer video de credits wola
 
-    def update(self):
-        # Add any game logic or updates here
-        pass
-
-    def draw(self):
-        self.screen.fill(self.WHITE)
-        text = self.font.render("Appuyez sur Entrée pour commencer", True, self.BLACK)
-        text_rect = text.get_rect(center=(self.screen.get_width() // 2, self.screen.get_height() // 2))
-        self.screen.blit(text, text_rect)
+        # Afficher le texte et les boutons du menu
+        screen.fill(WHITE)
+        if in_settings_menu:
+            # Menu des paramètres
+            back_button = pg.Rect(c.SCREEN_WIDTH // 2 - 100, c.SCREEN_HEIGHT // 2 + 150, 200, 50)
+            back_text = font.render("Retour", True, BLACK)
+            back_text_rect = back_text.get_rect(center=back_button.center)
+            screen.blit(back_text, back_text_rect)
+        else:
+            # Menu principal
+            pg.draw.rect(screen, BLACK, start_button, 2)
+            screen.blit(start_text, start_text_rect)
+            pg.draw.rect(screen, BLACK, settings_button, 2)
+            screen.blit(settings_text, settings_text_rect)
+            pg.draw.rect(screen, BLACK, quit_button, 2)
+            screen.blit(quit_text, quit_text_rect)
+            pg.draw.rect(screen,BLACK, credit_button, 2)
+            screen.blit(credit_text, credit_text_rect)
+        # Mettre à jour l'affichage
         pg.display.flip()
 
-    def quit(self):
-        pg.quit()
+# Vérifiez si ce fichier est exécuté en tant que script principal
+if __name__ == "__main__":
+    run_menu()
+
+
+
+    

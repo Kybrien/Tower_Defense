@@ -43,6 +43,7 @@ selected_turret = None
 
 wave_number = 0 
 boss_spawned = False 
+
 #function for outputting text onto the screen
 def draw_text(text, font, text_col, x, y):
   img = font.render(text, True, text_col)
@@ -188,7 +189,7 @@ while run:
       last_enemy_spawn = pg.time.get_ticks()
       boss_spawned = True 
 
-
+      
     #draw buttons
     #button for placing turrets
     #for the "turret button" show cost of turret and draw the button
