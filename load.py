@@ -3,6 +3,10 @@ import json
 import constants as c
 
 #load images
+pg.init()
+pg.mixer.init() 
+pg.font.init()
+screen = pg.display.set_mode((c.SCREEN_WIDTH + c.SIDE_PANEL, c.SCREEN_HEIGHT ))
 #map
 map_image = pg.image.load('levels/level.png').convert_alpha()
 #turret spritesheets
