@@ -6,7 +6,11 @@ from turret import Turret
 from button import Button
 import menu
 import constants as c
+<<<<<<< HEAD
 # import load
+=======
+# from load import *
+>>>>>>> dc737cc9d4f9e254b36308d54db50c2ac17652a8
 
 WHITE = pg.Color(255, 255, 255)
 BLACK = pg.Color(0, 0, 0)
