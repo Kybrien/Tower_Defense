@@ -5,7 +5,9 @@ from world import World
 from turret import Turret
 from button import Button
 import constants as c
-# from load import *
+from menu import Menu
+from load import Load
+
 
 credits_timer = 10 * c.FPS
 
@@ -15,41 +17,38 @@ pg.init()
 #create clock
 clock = pg.time.Clock()
 
-
+ 
 
 ###########################################
 ####              MENU                 ####
 ###########################################
 
 
-# Define the window size
+ # Define the window size
 screen = pg.display.set_mode((c.SCREEN_WIDTH, c.SCREEN_HEIGHT))
 pg.display.set_caption("Menu d'Accueil")
-
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 font = pg.font.Font(None, 36)
-
-#Menu loop
+ #Menu loop
 running = True
 while running:
-    #Event Gestion
-    for event in pg.event.get():
-        if event.type == pg.QUIT:
-            running = False
-        if event.type == pg.KEYDOWN:
-            if event.key == pg.K_RETURN:
-                #If Enter Pressed, quit the loop
-                running = False
+     #Event Gestion
+     for event in pg.event.get():
+         if event.type == pg.QUIT:
+             running = False
+         if event.type == pg.KEYDOWN:
+             if event.key == pg.K_RETURN:
+                 #If Enter Pressed, quit the loop
+                 running = False
     
-    #Show Menu text
-    screen.fill(WHITE)
-    text = font.render("Appuyez sur Entrée pour commencer", True, BLACK)
-    text_rect = text.get_rect(center=(c.SCREEN_WIDTH //2 , c.SCREEN_HEIGHT//2 ))
-    screen.blit(text, text_rect)
-
-    #Update the display
-    pg.display.flip()
+     #Show Menu text
+     screen.fill(WHITE)
+     text = font.render("Appuyez sur Entrée pour commencer", True, BLACK)
+     text_rect = text.get_rect(center=(c.SCREEN_WIDTH //2 , c.SCREEN_HEIGHT//2 ))
+     screen.blit(text, text_rect)
+     #Update the display
+     pg.display.flip()
     
 ###########################################
 
@@ -200,7 +199,7 @@ run = True
 while run:
 
   clock.tick(c.FPS)
-
+  dt = clock.get_time() / 1000.0  # Convertir le temps en secondes
   #########################
   # UPDATING SECTION
   #########################
@@ -216,7 +215,7 @@ while run:
       game_outcome = 1 #win
 
     #update groups
-    enemy_group.update(world)
+    enemy_group.update(world,dt)
     turret_group.update(enemy_group, world)
 
     #highlight selected turret
