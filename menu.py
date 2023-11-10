@@ -1,5 +1,7 @@
 import pygame as pg
 import constants as c
+import load
+import game
 
 pg.init()
 WHITE = (255, 255, 255)
@@ -11,6 +13,7 @@ volume = 0.5  # Volume initial (50%)
 volume_step = 0.1  # Étape d'ajustement du volume
 
 def run_menu():
+    global volume
 
     # Définir la taille de la fenêtre
     screen = pg.display.set_mode((c.SCREEN_WIDTH, c.SCREEN_HEIGHT))
@@ -65,7 +68,7 @@ def run_menu():
                 mouse_pos = pg.mouse.get_pos()
                 if start_button.collidepoint(mouse_pos):
                     print("Début du jeu!")
-                    running = False  # Quittez le menu et commencez le jeu
+                    game.game_run()  # Quittez le menu et commencez le jeu
                 elif settings_button.collidepoint(mouse_pos):
                     in_settings_menu = True  # Accédez au menu des paramètres
                 elif credit_button.collidepoint(mouse_pos): 
@@ -77,17 +80,35 @@ def run_menu():
         screen.blit(background_image, (0, 0))
 
         if in_settings_menu:
-             # Bouton "+"
+            # Bouton "+"
             volume_up_button = pg.Rect(c.SCREEN_WIDTH // 2 - 150, c.SCREEN_HEIGHT // 2 + 100, 50, 50)
             volume_up_text = font.render("##### + #####", True, BLACK)
             volume_up_text_rect = volume_up_text.get_rect(center=volume_up_button.center)
             screen.blit(volume_up_text, volume_up_text_rect)
 
-             # Bouton "-"
+            # Bouton "-"
             volume_down_button = pg.Rect(c.SCREEN_WIDTH // 2 + 100, c.SCREEN_HEIGHT // 2 + 100, 50, 50)
             volume_down_text = font.render("##### - #####", True, BLACK)
             volume_down_text_rect = volume_down_text.get_rect(center=volume_down_button.center)
             screen.blit(volume_down_text, volume_down_text_rect)
+            
+            if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+                mouse_pos = pg.mouse.get_pos()
+
+                # Vérifier le clic sur le bouton "+"
+                if volume_up_button.collidepoint(mouse_pos):
+                    volume = min(1.0, volume + volume_step)
+                    pg.mixer.music.set_volume(volume)
+                    load.adjust_sound_effects_volume(volume)
+
+
+                # Vérifier le clic sur le bouton "-"
+                elif volume_down_button.collidepoint(mouse_pos):
+                    volume = max(0.0, volume - volume_step)
+                    pg.mixer.music.set_volume(volume)
+                    load.adjust_sound_effects_volume(volume)
+
+
 
             # Menu des paramètres
             back_button = pg.Rect(c.SCREEN_WIDTH // 2 - 100, c.SCREEN_HEIGHT // 2 + 300, 200, 50)

@@ -19,7 +19,7 @@ class World():
     self.missed_enemies = 0
 
   def process_data(self):
-    #look through data to extract relevant info
+    # Recupere les Datas
     for layer in self.level_data["layers"]:
       if layer["name"] == "tilemap":
         self.tile_map = layer["data"]
@@ -29,7 +29,7 @@ class World():
           self.process_waypoints(waypoint_data)
 
   def process_waypoints(self, data):
-    #iterate through waypoints to extract individual sets of x and y coordinates
+    # Recupere les coordonnées
     for point in data:
       temp_x = point.get("x")
       temp_y = point.get("y")
@@ -41,7 +41,7 @@ class World():
       enemies_to_spawn = enemies[enemy_type]
       for enemy in range(enemies_to_spawn):
         self.enemy_list.append(enemy_type)
-    #now randomize the list to shuffle the enemies
+    # Rend la liste aleatoire
     random.shuffle(self.enemy_list)
 
   def check_level_complete(self):
@@ -49,7 +49,6 @@ class World():
       return True
 
   def reset_level(self):
-    #reset enemy variables
     self.enemy_list = []
     self.spawned_enemies = 0
     self.killed_enemies = 0

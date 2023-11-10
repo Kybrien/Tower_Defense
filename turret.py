@@ -2,6 +2,8 @@ import pygame as pg
 import math
 import constants as c
 from turret_data import TURRET_DATA
+from world import World
+import load
 
 class Turret(pg.sprite.Sprite):
   def __init__(self, sprite_sheets, tile_x, tile_y, shot_fx):
@@ -63,15 +65,15 @@ class Turret(pg.sprite.Sprite):
     if self.target:
       self.play_animation()
     else:
-      #search for new target once turret has cooled down
+      # Recherche une nouvelle cible si cooldown
       if pg.time.get_ticks() - self.last_shot > (self.cooldown / world.game_speed):
         self.pick_target(enemy_group)
 
   def pick_target(self, enemy_group):
-    #find an enemy to target
+    # Trouve un ennemi
     x_dist = 0
     y_dist = 0
-    #check distance to each enemy to see if it is in range
+    # Verifie la distance avec l'ennemi
     for enemy in enemy_group:
       if enemy.health > 0:
         x_dist = enemy.pos[0] - self.x
@@ -80,23 +82,21 @@ class Turret(pg.sprite.Sprite):
         if dist < self.range:
           self.target = enemy
           self.angle = math.degrees(math.atan2(-y_dist, x_dist))
-          #damage enemy
+          # Degats
           self.target.health -= c.DAMAGE
-          #play sound effect
+          # Sound Effect
           self.shot_fx.play()
           break
 
   def play_animation(self):
-    #update image
     self.original_image = self.animation_list[self.frame_index]
-    #check if enough time has passed since the last update
+    # Verifie si assez de temps est passé depuis le dernier update
     if pg.time.get_ticks() - self.update_time > c.ANIMATION_DELAY:
       self.update_time = pg.time.get_ticks()
       self.frame_index += 1
-      #check if the animation has finished and reset to idle
+      # Verifie si l'animation est terminée
       if self.frame_index >= len(self.animation_list):
         self.frame_index = 0
-        #record completed time and clear target so cooldown can begin
         self.last_shot = pg.time.get_ticks()
         self.target = None
 
@@ -104,11 +104,11 @@ class Turret(pg.sprite.Sprite):
     self.upgrade_level += 1
     self.range = TURRET_DATA[self.upgrade_level - 1].get("range")
     self.cooldown = TURRET_DATA[self.upgrade_level - 1].get("cooldown")
-    #upgrade turret image
+    # Image Tourelle
     self.animation_list = self.load_images(self.sprite_sheets[self.upgrade_level - 1])
     self.original_image = self.animation_list[self.frame_index]
 
-    #upgrade range circle
+    # Cerle de Portée
     self.range_image = pg.Surface((self.range * 2, self.range * 2))
     self.range_image.fill((0, 0, 0))
     self.range_image.set_colorkey((0, 0, 0))
@@ -124,3 +124,39 @@ class Turret(pg.sprite.Sprite):
     surface.blit(self.image, self.rect)
     if self.selected:
       surface.blit(self.range_image, self.range_rect)
+
+
+
+
+def create_turret(world, mouse_pos, turret_group):
+  mouse_tile_x = mouse_pos[0] // c.TILE_SIZE
+  mouse_tile_y = mouse_pos[1] // c.TILE_SIZE
+  tile_map = world.tile_map
+
+  # Calcule le sequentiel de la tuile
+  mouse_tile_num = (mouse_tile_y * c.COLS) + mouse_tile_x
+  # Verifie si c'est de la Grass
+  if tile_map[mouse_tile_num] == 265:
+    # Verifie si il n'y a pas deja une tourelle
+    space_is_free = True
+    for turret_inst in turret_group:
+      if (mouse_tile_x, mouse_tile_y) == (turret_inst.tile_x, turret_inst.tile_y):
+        space_is_free = False
+    # Si emplacement libre
+    if space_is_free == True:
+      new_turret = Turret(load.turret_spritesheets, mouse_tile_x, mouse_tile_y, load.shot_fx)
+      turret_group.add(new_turret)
+      # Retire de l'argent
+      world.money -= c.BUY_COST
+
+def select_turret(mouse_pos, turret_group):
+  mouse_tile_x = mouse_pos[0] // c.TILE_SIZE
+  mouse_tile_y = mouse_pos[1] // c.TILE_SIZE
+  for turret in turret_group:
+    if (mouse_tile_x, mouse_tile_y) == (turret.tile_x, turret.tile_y):
+      return turret
+
+def clear_selection(turret_group):
+  for turret_inst in turret_group:
+    turret_inst.selected = False
+
