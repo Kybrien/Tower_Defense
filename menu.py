@@ -10,7 +10,7 @@ font = pg.font.Font(None, 36)
 screen = pg.display.set_mode((c.SCREEN_WIDTH + c.SIDE_PANEL, c.SCREEN_HEIGHT ))
 background_image = pg.image.load("assets/images/background/background_image.png").convert_alpha()
 volume = 0.5  # Volume initial (50%)
-volume_step = 0.1  # Étape d'ajustement du volume
+volume_step = 0.00050  # Étape d'ajustement du volume
 
 def run_menu():
     global volume
